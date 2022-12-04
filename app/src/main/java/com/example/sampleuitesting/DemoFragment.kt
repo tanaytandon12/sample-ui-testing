@@ -47,6 +47,13 @@ class DemoFragment : Fragment() {
                         mBinding.grpSuccess.visibility = View.GONE
                         mBinding.grpError.visibility = View.GONE
                     }
+                    is DemoDataStatus.Success -> {
+                        mBinding.tvTitle.text = it.data.title
+                        mBinding.tvDescription.text = it.data.description
+                        mBinding.grpSuccess.visibility = View.VISIBLE
+                        mBinding.pbDemo.visibility = View.GONE
+                        mBinding.grpError.visibility = View.GONE
+                    }
                     else -> {}
                 }
             }

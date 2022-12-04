@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 
 import org.junit.Assert.*
 import org.junit.Before
+import java.util.UUID
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -53,6 +54,21 @@ class DemoUITest {
         isViewNotVisible(R.id.tvDescription)
         isViewNotVisible(R.id.tvTitle)
         isViewNotVisible(R.id.btnRetry)
+        mScenario.moveToState(Lifecycle.State.DESTROYED)
+    }
+
+    @Test
+    fun verifySuccessState() {
+        mScenario.moveToState(Lifecycle.State.STARTED)
+        val demo = DemoData(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        mMutableStateFlow.value = DemoDataStatus.Success(demo)
+        isViewNotVisible(R.id.pbDemo)
+        isViewVisible(R.id.tvDescription)
+        isViewVisible(R.id.tvTitle)
+        isViewNotVisible(R.id.tvError)
+        isViewNotVisible(R.id.btnRetry)
+        verifyText(demo.title, R.id.tvTitle)
+        verifyText(demo.description, R.id.tvDescription)
         mScenario.moveToState(Lifecycle.State.DESTROYED)
     }
 }
