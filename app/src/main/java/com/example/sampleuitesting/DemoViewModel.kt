@@ -2,14 +2,12 @@ package com.example.sampleuitesting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 
 abstract class DemoViewModel : ViewModel() {
-    abstract fun fetchInfo(id: Long): Flow<DemoDataStatus>
+    abstract fun fetchInfo(): Flow<DemoDataStatus>
 
     class Factory() : ViewModelProvider.NewInstanceFactory() {
         companion object {
@@ -25,7 +23,7 @@ abstract class DemoViewModel : ViewModel() {
 }
 
 class DemoViewModelImpl() : DemoViewModel() {
-    override fun fetchInfo(id: Long): Flow<DemoDataStatus> {
+    override fun fetchInfo(): Flow<DemoDataStatus> {
         return flow {
             emit(DemoDataStatus.Loading)
             delay(2000L)
@@ -40,10 +38,11 @@ class DemoViewModelImpl() : DemoViewModel() {
 
 }
 
-data class DemoData(val title: String, val description: String)
 
 sealed class DemoDataStatus {
     object Loading : DemoDataStatus()
     data class Success(val data: DemoData) : DemoDataStatus()
     data class Error(val msg: String) : DemoDataStatus()
 }
+
+data class DemoData(val title: String, val description: String)

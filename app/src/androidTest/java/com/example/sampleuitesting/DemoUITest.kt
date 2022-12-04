@@ -3,18 +3,15 @@ package com.example.sampleuitesting
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import org.junit.Assert.*
 import org.junit.Before
 import java.util.UUID
 
@@ -39,7 +36,7 @@ class DemoUITest {
     @Before
     fun setup() {
         DemoViewModel.Factory.INSTANCE = mViewModel
-        every { mViewModel.fetchInfo(any()) } returns mMutableStateFlow
+        every { mViewModel.fetchInfo() } returns mMutableStateFlow
         mScenario =
             launchFragmentInContainer(themeResId = R.style.Theme_SampleUITesting)
     }
@@ -88,10 +85,10 @@ class DemoUITest {
     @Test
     fun verifyFetchInfoStatus() {
         mScenario.moveToState(Lifecycle.State.STARTED)
-        verify(atMost = 1, atLeast = 1) { mViewModel.fetchInfo(any()) }
+        verify(atMost = 1, atLeast = 1) { mViewModel.fetchInfo() }
         mMutableStateFlow.value = DemoDataStatus.Error(UUID.randomUUID().toString())
         performClick(R.id.btnRetry)
-        verify(atMost = 2, atLeast = 2) { mViewModel.fetchInfo(any()) }
+        verify(atMost = 2, atLeast = 2) { mViewModel.fetchInfo() }
         mScenario.moveToState(Lifecycle.State.DESTROYED)
     }
 }

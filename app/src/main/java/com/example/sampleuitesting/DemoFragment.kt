@@ -47,7 +47,7 @@ class DemoFragment : Fragment() {
 
     private fun fetchInfo() {
         viewLifecycleOwner.lifecycleScope.launch {
-            mViewModel.fetchInfo(randomId()).collect {
+            mViewModel.fetchInfo().collect {
                 when (it) {
                     is DemoDataStatus.Loading -> {
                         mBinding.pbDemo.visibility = View.VISIBLE
@@ -73,5 +73,4 @@ class DemoFragment : Fragment() {
         }
     }
 
-    private fun randomId(): Long = (Math.random() * 100).toLong()
 }
