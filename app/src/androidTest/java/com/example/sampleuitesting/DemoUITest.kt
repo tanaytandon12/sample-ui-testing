@@ -5,6 +5,9 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.mockk.every
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -30,17 +33,13 @@ class DemoUITest {
     }
 
     private val mViewModel: DemoViewModel by lazy {
-        object : DemoViewModel() {
-            override fun fetchInfo(id: Long): Flow<DemoDataStatus> {
-                return mMutableStateFlow
-            }
-
-        }
+        spyk()
     }
 
     @Before
     fun setup() {
         DemoViewModel.Factory.INSTANCE = mViewModel
+        every { mViewModel.fetchInfo(any()) } returns mMutableStateFlow
         mScenario =
             launchFragmentInContainer(themeResId = R.style.Theme_SampleUITesting)
     }
@@ -69,6 +68,30 @@ class DemoUITest {
         isViewNotVisible(R.id.btnRetry)
         verifyText(demo.title, R.id.tvTitle)
         verifyText(demo.description, R.id.tvDescription)
+        mScenario.moveToState(Lifecycle.State.DESTROYED)
+    }
+
+    @Test
+    fun verifyErrorState() {
+        mScenario.moveToState(Lifecycle.State.STARTED)
+        val randomErr = UUID.randomUUID().toString()
+        mMutableStateFlow.value = DemoDataStatus.Error(randomErr)
+        isViewNotVisible(R.id.pbDemo)
+        isViewNotVisible(R.id.tvTitle)
+        isViewNotVisible(R.id.tvDescription)
+        verifyText(randomErr, R.id.tvError)
+        isViewVisible(R.id.tvError)
+        isViewVisible(R.id.btnRetry)
+        mScenario.moveToState(Lifecycle.State.DESTROYED)
+    }
+
+    @Test
+    fun verifyFetchInfoStatus() {
+        mScenario.moveToState(Lifecycle.State.STARTED)
+        verify(atMost = 1, atLeast = 1) { mViewModel.fetchInfo(any()) }
+        mMutableStateFlow.value = DemoDataStatus.Error(UUID.randomUUID().toString())
+        performClick(R.id.btnRetry)
+        verify(atMost = 2, atLeast = 2) { mViewModel.fetchInfo(any()) }
         mScenario.moveToState(Lifecycle.State.DESTROYED)
     }
 }

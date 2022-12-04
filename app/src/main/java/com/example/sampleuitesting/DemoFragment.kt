@@ -39,6 +39,13 @@ class DemoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        fetchInfo()
+        mBinding.btnRetry.setOnClickListener {
+            fetchInfo()
+        }
+    }
+
+    private fun fetchInfo() {
         viewLifecycleOwner.lifecycleScope.launch {
             mViewModel.fetchInfo(randomId()).collect {
                 when (it) {
@@ -53,6 +60,12 @@ class DemoFragment : Fragment() {
                         mBinding.grpSuccess.visibility = View.VISIBLE
                         mBinding.pbDemo.visibility = View.GONE
                         mBinding.grpError.visibility = View.GONE
+                    }
+                    is DemoDataStatus.Error -> {
+                        mBinding.pbDemo.visibility = View.GONE
+                        mBinding.grpSuccess.visibility = View.GONE
+                        mBinding.tvError.text = it.msg
+                        mBinding.grpError.visibility = View.VISIBLE
                     }
                     else -> {}
                 }
